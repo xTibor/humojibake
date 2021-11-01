@@ -40,6 +40,8 @@ pub use mac_roman::ENCODING_MAC_ROMAN;
 pub use szki::ENCODING_SZKI;
 pub use tvc::ENCODING_TVC;
 
+use crate::error::Error;
+
 pub type EncodingTable = [char; 256];
 
 // rustfmt still doesn't properly support vertical alignment.
@@ -71,19 +73,23 @@ pub const ENCODINGS: &[(&str, &EncodingTable, bool)] = &[
 pub fn max_encoding_name_width() -> usize {
     ENCODINGS
         .iter()
-        .map(|(encoding_name, _, _)| encoding_name.len())
+        .map(|(encoding_name, _, _)| encoding_name.chars().count())
         .max()
         .unwrap_or(0)
 }
 
-pub fn from_str(name: &str) -> Option<&EncodingTable> {
+pub fn from_str(name: &str) -> Result<&EncodingTable, Error> {
     let name = name.to_uppercase();
+
     for (encoding_name, encoding_table, _) in ENCODINGS {
         if *encoding_name == name {
-            return Some(encoding_table);
+            return Ok(encoding_table);
         }
     }
-    None
+
+    Err(Error::UnsupportedEncoding {
+        encoding_name: name,
+    })
 }
 
 pub fn supports_charset(encoding_table: &EncodingTable, charset: &[char]) -> bool {

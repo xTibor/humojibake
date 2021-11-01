@@ -7,6 +7,9 @@ use encodings::*;
 mod utils;
 use utils::hexstr_to_vec;
 
+mod error;
+use error::Error;
+
 use structopt::StructOpt;
 
 #[derive(StructOpt)]
@@ -75,7 +78,7 @@ const WORD_SEPARATORS: &[char] = &[
     ')', '[', ']', '-', '–', '—', '+', '/',
 ];
 
-fn main() {
+fn main() -> Result<(), Error> {
     let args = AppArgs::from_args();
 
     match args {
@@ -90,7 +93,7 @@ fn main() {
             hide_uncommon,
             show_foreign,
         } => {
-            let bin_string = hexstr_to_vec(&input);
+            let bin_string = hexstr_to_vec(&input)?;
 
             let mut results: Vec<(&str, isize, String)> = Vec::new();
 
@@ -121,12 +124,13 @@ fn main() {
                     // Convert char array to string
                     .map(|i| i.iter().collect::<String>())
                     // Filter out short words
-                    .filter(|s| s.len() >= 4)
+                    .filter(|s| s.chars().count() >= 4)
                     // Filter out words with weird capitalizations (AAAaAAA, aaaAaaa, etc.)
                     .filter(|s| {
                         let is_lowercase = *s == s.to_lowercase();
                         let is_uppercase = *s == s.to_uppercase();
                         let is_capitalcase = {
+                            // This unwrap() cannot fail because of the length filtering above
                             let (left, right) = (s.chars().next().unwrap(), s.chars().skip(1).collect::<String>());
                             (left.is_uppercase()) && (right == right.to_lowercase())
                         };
@@ -167,11 +171,11 @@ fn main() {
             input,
             target_encoding_name,
         } => {
-            let encoding_table = encodings::from_str(&target_encoding_name).unwrap();
+            let encoding_table = encodings::from_str(&target_encoding_name)?;
 
             let result = input
                 .chars()
-                .map(|c| encoding_table.iter().position(|&p| p == c).unwrap() as u8)
+                .map(|c| encoding_table.iter().position(|&p| p == c).unwrap_or(0) as u8)
                 .map(|b| format!("{:02X}", b))
                 .intersperse(" ".to_owned())
                 .collect::<String>();
@@ -209,20 +213,25 @@ fn main() {
             }
         }
         AppArgs::StreamToUtf8 { source_encoding_name } => {
-            let source_encoding_table = encodings::from_str(&source_encoding_name).unwrap();
+            let source_encoding_table = encodings::from_str(&source_encoding_name)?;
+
             todo!();
         }
         AppArgs::StreamFromUtf8 { target_encoding_name } => {
-            let target_encoding_table = encodings::from_str(&target_encoding_name).unwrap();
+            let target_encoding_table = encodings::from_str(&target_encoding_name)?;
+
             todo!();
         }
         AppArgs::StreamBetween {
             source_encoding_name,
             target_encoding_name,
         } => {
-            let source_encoding_table = encodings::from_str(&source_encoding_name).unwrap();
-            let target_encoding_table = encodings::from_str(&target_encoding_name).unwrap();
+            let source_encoding_table = encodings::from_str(&source_encoding_name)?;
+            let target_encoding_table = encodings::from_str(&target_encoding_name)?;
+
             todo!();
         }
     }
+
+    Ok(())
 }
