@@ -2,8 +2,6 @@
 #![feature(iter_intersperse)]
 
 mod encodings;
-use std::fmt::format;
-
 use encodings::*;
 
 mod utils;
@@ -14,7 +12,7 @@ use structopt::StructOpt;
 #[derive(StructOpt)]
 enum AppArgs {
     List,
-    Guess {
+    GuessHex {
         #[structopt(help = "Hexadecimal input")]
         input: String,
         #[structopt(long, help = "Hide the preview text")]
@@ -23,10 +21,11 @@ enum AppArgs {
         hide_uncommon: bool,
         #[structopt(long, help = "Show encodings with partial or no Hungarian language support")]
         show_foreign: bool,
+        // TODO: Switch between simple and advanced scoring
     },
-    Encode {
-        #[structopt(help = "Encoding name. See the `list` subcommand for supported encodings.")]
-        encoding_name: String,
+    EncodeHex {
+        #[structopt(help = "Target encoding name. See the `list` subcommand for supported encodings.")]
+        target_encoding_name: String,
         #[structopt(help = "Input text")]
         input: String,
     },
@@ -38,6 +37,20 @@ enum AppArgs {
         input: String,
         #[structopt(long, help = "Hide uncommon encodings")]
         hide_uncommon: bool,
+    },
+    StreamToUtf8 {
+        #[structopt(help = "Source encoding name. See the `list` subcommand for supported encodings.")]
+        source_encoding_name: String,
+    },
+    StreamFromUtf8 {
+        #[structopt(help = "Target encoding name. See the `list` subcommand for supported encodings.")]
+        target_encoding_name: String,
+    },
+    StreamBetween {
+        #[structopt(help = "Source encoding name. See the `list` subcommand for supported encodings.")]
+        source_encoding_name: String,
+        #[structopt(help = "Target encoding name. See the `list` subcommand for supported encodings.")]
+        target_encoding_name: String,
     },
 }
 
@@ -71,7 +84,7 @@ fn main() {
                 println!("{}", encoding_name);
             }
         }
-        AppArgs::Guess {
+        AppArgs::GuessHex {
             input,
             hide_preview,
             hide_uncommon,
@@ -128,9 +141,9 @@ fn main() {
                 results.push((encoding_name, score_advanced, preview_string));
             }
 
-            results.sort_by_key(|entry| -entry.1);
+            results.sort_by_key(|(_, score, _)| -score);
 
-            let max_score_width = (results.iter().map(|result| result.1).max().unwrap_or(0) as f64)
+            let max_score_width = (results.iter().map(|(_, score, _)| *score).max().unwrap_or(0) as f64)
                 .log10()
                 .ceil() as usize;
 
@@ -150,8 +163,11 @@ fn main() {
                 println!();
             }
         }
-        AppArgs::Encode { input, encoding_name } => {
-            let encoding_table = encodings::from_str(&encoding_name).unwrap();
+        AppArgs::EncodeHex {
+            input,
+            target_encoding_name,
+        } => {
+            let encoding_table = encodings::from_str(&target_encoding_name).unwrap();
 
             let result = input
                 .chars()
@@ -191,6 +207,22 @@ fn main() {
                     );
                 }
             }
+        }
+        AppArgs::StreamToUtf8 { source_encoding_name } => {
+            let source_encoding_table = encodings::from_str(&source_encoding_name).unwrap();
+            todo!();
+        }
+        AppArgs::StreamFromUtf8 { target_encoding_name } => {
+            let target_encoding_table = encodings::from_str(&target_encoding_name).unwrap();
+            todo!();
+        }
+        AppArgs::StreamBetween {
+            source_encoding_name,
+            target_encoding_name,
+        } => {
+            let source_encoding_table = encodings::from_str(&source_encoding_name).unwrap();
+            let target_encoding_table = encodings::from_str(&target_encoding_name).unwrap();
+            todo!();
         }
     }
 }
