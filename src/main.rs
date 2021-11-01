@@ -57,6 +57,11 @@ const HUNGARIAN_ACCENTED_CHARSET: &[char] = &[
     'á', 'é', 'í', 'ú', 'ü', 'ű', 'ó', 'ö', 'ő',
 ];
 
+const WORD_SEPARATORS: &[char] = &[
+    ' ', '\n', '\t', '\r', '.', '…', '!', '?', ',', '‚', ':', ';', '\'', '"', '’', '„', '”', '«', '»', '‹', '›', '(',
+    ')', '[', ']', '-', '–', '—', '+', '/',
+];
+
 fn main() {
     let args = AppArgs::from_args();
 
@@ -85,16 +90,42 @@ fn main() {
                     continue;
                 }
 
-                let score = bin_string
+                let decoded = bin_string
                     .iter()
                     .map(|&b| encoding_table[b as usize])
-                    .map(|c| if HUNGARIAN_CHARSET.contains(&c) { 1 } else { 0 })
+                    .collect::<Vec<char>>();
+
+                let score_simple: isize = decoded
+                    .iter()
+                    .map(|c| if HUNGARIAN_CHARSET.contains(c) { 1 } else { 0 })
                     .sum();
-                // TODO: Penalize weird capitalizations ("aÁaaaaa", "AAAAáAAA")
+
+                let score_advanced: isize = decoded
+                    // Split to words
+                    .split(|&c| WORD_SEPARATORS.contains(&c))
+                    // Filter out invalid looking words
+                    .filter(|i| i.iter().all(|c| HUNGARIAN_CHARSET.contains(c)))
+                    // Convert char array to string
+                    .map(|i| i.iter().collect::<String>())
+                    // Filter out short words
+                    .filter(|s| s.len() >= 4)
+                    // Filter out words with weird capitalizations (AAAaAAA, aaaAaaa, etc.)
+                    .filter(|s| {
+                        let is_lowercase = *s == s.to_lowercase();
+                        let is_uppercase = *s == s.to_uppercase();
+                        let is_capitalcase = {
+                            let (left, right) = (s.chars().next().unwrap(), s.chars().skip(1).collect::<String>());
+                            (left.is_uppercase()) && (right == right.to_lowercase())
+                        };
+                        is_lowercase || is_uppercase || is_capitalcase
+                    })
+                    // Cumulative length of the remaining words
+                    .map(|s| s.chars().count() as isize)
+                    .sum();
 
                 let preview_string = bin_string.iter().map(|&b| encoding_table[b as usize]).collect();
 
-                results.push((encoding_name, score, preview_string));
+                results.push((encoding_name, score_advanced, preview_string));
             }
 
             results.sort_by_key(|entry| -entry.1);
