@@ -2,7 +2,7 @@
 #![feature(iter_intersperse)]
 
 mod encodings;
-use encodings::{decode, encode, max_encoding_name_width, ENCODINGS};
+use encodings::{max_encoding_name_width, ENCODINGS};
 
 mod utils;
 use utils::hexstr_to_vec;
@@ -189,7 +189,7 @@ fn main() -> Result<(), Error> {
 
             for b in reader.bytes().filter_map(Result::ok) {
                 let c = encodings::decode(source_encoding_table, b);
-                write!(writer, "{}", c).unwrap();
+                write!(writer, "{}", c)?;
             }
         }
         AppArgs::ConvertFromUtf8 { target_encoding_name } => {
@@ -214,7 +214,7 @@ fn main() -> Result<(), Error> {
             for b in reader.bytes().filter_map(Result::ok) {
                 let c = encodings::decode(source_encoding_table, b);
                 let b = encodings::encode(target_encoding_table, c);
-                writer.write_all(&[b]).unwrap();
+                writer.write_all(&[b])?;
             }
         }
     }
