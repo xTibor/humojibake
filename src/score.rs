@@ -5,6 +5,7 @@ use strum::{EnumString, EnumVariantNames};
 pub enum ScoreStrategy {
     Simple,
     Advanced,
+    // TODO: Explore trigram analysis
 }
 
 impl ScoreStrategy {
@@ -30,23 +31,18 @@ fn score_strategy_advanced(charset: &[char], input: &[char]) -> isize {
         // Split to words
         .split(|&c| WORD_SEPARATORS.contains(&c))
         // Filter out invalid looking words
-        .filter(|i| i.iter().all(|c| charset.contains(c)))
-        // Convert char array to string
-        .map(|i| i.iter().collect::<String>())
+        .filter(|&word| word.iter().all(|c| charset.contains(c)))
         // Filter out short words
-        .filter(|s| s.chars().count() >= 4)
+        .filter(|&word| word.len() >= 4)
         // Filter out words with weird capitalizations (AAAaAAA, aaaAaaa, etc.)
-        .filter(|s| {
-            let is_lowercase = *s == s.to_lowercase();
-            let is_uppercase = *s == s.to_uppercase();
-            let is_capitalcase = {
-                // This unwrap() cannot fail because of the length filtering above
-                let (left, right) = (s.chars().next().unwrap(), s.chars().skip(1).collect::<String>());
-                (left.is_uppercase()) && (right == right.to_lowercase())
-            };
+        .filter(|&word| {
+            let is_lowercase = word.iter().cloned().all(char::is_lowercase);
+            let is_uppercase = word.iter().cloned().all(char::is_uppercase);
+            let is_capitalcase = (word[0].is_uppercase()) && (word[1..].iter().cloned().all(char::is_lowercase));
+
             is_lowercase || is_uppercase || is_capitalcase
         })
         // Cumulative length of the remaining words
-        .map(|s| s.chars().count() as isize)
+        .map(|word| word.len() as isize)
         .sum()
 }
