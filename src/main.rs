@@ -7,6 +7,9 @@ use encodings::{decode, encode, max_encoding_name_width, ENCODINGS};
 mod utils;
 use utils::hexstr_to_vec;
 
+mod score;
+use score::ScoreStrategy;
+
 mod error;
 use error::Error;
 
@@ -26,7 +29,8 @@ enum AppArgs {
         hide_uncommon: bool,
         #[structopt(long, help = "Show encodings with partial or no Hungarian language support")]
         show_foreign: bool,
-        // TODO: Switch between simple and advanced scoring
+        #[structopt(long, help = "Guess scoring strategy", default_value = "advanced")]
+        score_strategy: ScoreStrategy,
     },
     EncodeHex {
         #[structopt(help = "Target encoding name. See the `list` subcommand for supported encodings.")]
@@ -60,24 +64,13 @@ enum AppArgs {
 }
 
 #[rustfmt::skip]
-const HUNGARIAN_CHARSET: &[char] = &[
+pub const HUNGARIAN_CHARSET: &[char] = &[
     'A', 'Á', 'B', 'C', 'D', 'E', 'É', 'F', 'G', 'H', 'I', 'Í', 'J', 'K', 'L', 'M',
     'N', 'O', 'Ó', 'Ö', 'Ő', 'P', 'Q', 'R', 'S', 'T', 'U', 'Ú', 'Ü', 'Ű', 'V', 'W',
     'X', 'Y', 'Z',
     'a', 'á', 'b', 'c', 'd', 'e', 'é', 'f', 'g', 'h', 'i', 'í', 'j', 'k', 'l', 'm',
     'n', 'o', 'ó', 'ö', 'ő', 'p', 'q', 'r', 's', 't', 'u', 'ú', 'ü', 'ű', 'v', 'w',
     'x', 'y', 'z',
-];
-
-#[rustfmt::skip]
-const HUNGARIAN_ACCENTED_CHARSET: &[char] = &[
-    'Á', 'É', 'Í', 'Ú', 'Ü', 'Ű', 'Ó', 'Ö', 'Ő',
-    'á', 'é', 'í', 'ú', 'ü', 'ű', 'ó', 'ö', 'ő',
-];
-
-const WORD_SEPARATORS: &[char] = &[
-    ' ', '\n', '\t', '\r', '.', '…', '!', '?', ',', '‚', ':', ';', '\'', '"', '’', '„', '”', '«', '»', '‹', '›', '(',
-    ')', '[', ']', '-', '–', '—', '+', '/',
 ];
 
 fn main() -> Result<(), Error> {
@@ -94,6 +87,7 @@ fn main() -> Result<(), Error> {
             hide_preview,
             hide_uncommon,
             show_foreign,
+            score_strategy,
         } => {
             let bin_string = hexstr_to_vec(&input)?;
 
@@ -113,38 +107,10 @@ fn main() -> Result<(), Error> {
                     .map(|&b| encodings::decode(encoding_table, b))
                     .collect::<Vec<char>>();
 
-                let score_simple: isize = decoded
-                    .iter()
-                    .map(|c| if HUNGARIAN_CHARSET.contains(c) { 1 } else { 0 })
-                    .sum();
-
-                let score_advanced: isize = decoded
-                    // Split to words
-                    .split(|&c| WORD_SEPARATORS.contains(&c))
-                    // Filter out invalid looking words
-                    .filter(|i| i.iter().all(|c| HUNGARIAN_CHARSET.contains(c)))
-                    // Convert char array to string
-                    .map(|i| i.iter().collect::<String>())
-                    // Filter out short words
-                    .filter(|s| s.chars().count() >= 4)
-                    // Filter out words with weird capitalizations (AAAaAAA, aaaAaaa, etc.)
-                    .filter(|s| {
-                        let is_lowercase = *s == s.to_lowercase();
-                        let is_uppercase = *s == s.to_uppercase();
-                        let is_capitalcase = {
-                            // This unwrap() cannot fail because of the length filtering above
-                            let (left, right) = (s.chars().next().unwrap(), s.chars().skip(1).collect::<String>());
-                            (left.is_uppercase()) && (right == right.to_lowercase())
-                        };
-                        is_lowercase || is_uppercase || is_capitalcase
-                    })
-                    // Cumulative length of the remaining words
-                    .map(|s| s.chars().count() as isize)
-                    .sum();
-
+                let score = score_strategy.eval(HUNGARIAN_CHARSET, &decoded);
                 let preview_string = decoded.iter().collect();
 
-                results.push((encoding_name, score_advanced, preview_string));
+                results.push((encoding_name, score, preview_string));
             }
 
             results.sort_by_key(|(_, score, _)| -score);
