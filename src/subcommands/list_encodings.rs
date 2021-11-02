@@ -4,9 +4,9 @@ use crate::encodings::ENCODINGS;
 use crate::subcommands::Subcommand;
 
 #[derive(StructOpt)]
-pub struct ListArgs {}
+pub struct ListEncodingsArgs {}
 
-impl Subcommand for ListArgs {
+impl Subcommand for ListEncodingsArgs {
     fn execute(&self) -> Result<(), crate::error::Error> {
         for (encoding_name, _, _) in ENCODINGS {
             println!("{}", encoding_name);

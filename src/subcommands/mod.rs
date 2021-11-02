@@ -3,7 +3,8 @@ mod convert_from_utf8;
 mod convert_to_utf8;
 mod encode_hex;
 mod guess_hex;
-mod list;
+mod list_encodings;
+mod list_languages;
 mod showcase;
 
 use self::convert_between::ConvertBetweenArgs;
@@ -11,7 +12,8 @@ use self::convert_from_utf8::ConvertFromUtf8Args;
 use self::convert_to_utf8::ConvertToUtf8Args;
 use self::encode_hex::EncodeHexArgs;
 use self::guess_hex::GuessHexArgs;
-use self::list::ListArgs;
+use self::list_encodings::ListEncodingsArgs;
+use self::list_languages::ListLanguagesArgs;
 use self::showcase::ShowcaseArgs;
 
 use structopt::StructOpt;
@@ -29,7 +31,8 @@ pub enum SubcommandArgs {
     ConvertToUtf8(ConvertToUtf8Args),
     EncodeHex(EncodeHexArgs),
     GuessHex(GuessHexArgs),
-    List(ListArgs),
+    ListEncodings(ListEncodingsArgs),
+    ListLanguages(ListLanguagesArgs),
     Showcase(ShowcaseArgs),
 }
 
@@ -41,7 +44,8 @@ impl Subcommand for SubcommandArgs {
             SubcommandArgs::ConvertToUtf8(args) => args.execute(),
             SubcommandArgs::EncodeHex(args) => args.execute(),
             SubcommandArgs::GuessHex(args) => args.execute(),
-            SubcommandArgs::List(args) => args.execute(),
+            SubcommandArgs::ListEncodings(args) => args.execute(),
+            SubcommandArgs::ListLanguages(args) => args.execute(),
             SubcommandArgs::Showcase(args) => args.execute(),
         }
     }

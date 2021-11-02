@@ -3,6 +3,7 @@
 
 mod encodings;
 mod error;
+mod language;
 mod score;
 mod utils;
 

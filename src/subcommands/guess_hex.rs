@@ -1,6 +1,7 @@
 use structopt::StructOpt;
 
 use crate::encodings::{self, max_encoding_name_width, ENCODINGS};
+use crate::language::Language;
 use crate::score::ScoreStrategy;
 use crate::subcommands::Subcommand;
 use crate::utils::hexstr_to_vec;
@@ -16,22 +17,19 @@ pub struct GuessHexArgs {
     #[structopt(long, help = "Hide uncommon encodings")]
     pub hide_uncommon: bool,
 
-    #[structopt(long, help = "Show encodings with partial or no Hungarian language support")]
+    #[structopt(long, help = "Show encodings incompatible with the selected language")]
     pub show_foreign: bool,
 
     #[structopt(long, help = "Guess scoring strategy", default_value = "advanced")]
     pub score_strategy: ScoreStrategy,
-}
 
-#[rustfmt::skip]
-const HUNGARIAN_CHARSET: &[char] = &[
-    'A', 'Á', 'B', 'C', 'D', 'E', 'É', 'F', 'G', 'H', 'I', 'Í', 'J', 'K', 'L', 'M',
-    'N', 'O', 'Ó', 'Ö', 'Ő', 'P', 'Q', 'R', 'S', 'T', 'U', 'Ú', 'Ü', 'Ű', 'V', 'W',
-    'X', 'Y', 'Z',
-    'a', 'á', 'b', 'c', 'd', 'e', 'é', 'f', 'g', 'h', 'i', 'í', 'j', 'k', 'l', 'm',
-    'n', 'o', 'ó', 'ö', 'ő', 'p', 'q', 'r', 's', 't', 'u', 'ú', 'ü', 'ű', 'v', 'w',
-    'x', 'y', 'z',
-];
+    #[structopt(
+        long,
+        help = "Language the guess is based on. See the `list-languages` subcommand for supported languages.",
+        default_value = "hungarian"
+    )]
+    pub language: Language,
+}
 
 impl Subcommand for GuessHexArgs {
     fn execute(&self) -> Result<(), crate::error::Error> {
@@ -40,7 +38,7 @@ impl Subcommand for GuessHexArgs {
         let mut results: Vec<(&str, isize, String)> = Vec::new();
 
         for (encoding_name, encoding_table, encoding_is_common) in ENCODINGS {
-            if !encodings::supports_charset(encoding_table, HUNGARIAN_CHARSET) && !self.show_foreign {
+            if !encodings::supports_charset(encoding_table, self.language.get_charset()) && !self.show_foreign {
                 continue;
             }
 
@@ -53,7 +51,7 @@ impl Subcommand for GuessHexArgs {
                 .map(|&b| encodings::decode(encoding_table, b))
                 .collect::<Vec<char>>();
 
-            let score = self.score_strategy.eval(HUNGARIAN_CHARSET, &decoded);
+            let score = self.score_strategy.eval(self.language.get_charset(), &decoded);
             let preview_string = decoded.iter().collect();
 
             results.push((encoding_name, score, preview_string));
