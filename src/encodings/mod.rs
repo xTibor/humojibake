@@ -87,9 +87,7 @@ pub fn from_str(name: &str) -> Result<&EncodingTable, Error> {
         }
     }
 
-    Err(Error::UnsupportedEncoding {
-        encoding_name: name,
-    })
+    Err(Error::UnsupportedEncoding { encoding_name: name })
 }
 
 pub fn supports_charset(encoding_table: &EncodingTable, charset: &[char]) -> bool {

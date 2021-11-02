@@ -2,7 +2,7 @@
 #![feature(iter_intersperse)]
 
 mod encodings;
-use encodings::*;
+use encodings::{max_encoding_name_width, ENCODINGS};
 
 mod utils;
 use utils::hexstr_to_vec;
@@ -11,6 +11,8 @@ mod error;
 use error::Error;
 
 use structopt::StructOpt;
+
+use std::io::{self, BufReader, BufWriter, Read, Write};
 
 #[derive(StructOpt)]
 enum AppArgs {
@@ -41,15 +43,15 @@ enum AppArgs {
         #[structopt(long, help = "Hide uncommon encodings")]
         hide_uncommon: bool,
     },
-    StreamToUtf8 {
+    ConvertToUtf8 {
         #[structopt(help = "Source encoding name. See the `list` subcommand for supported encodings.")]
         source_encoding_name: String,
     },
-    StreamFromUtf8 {
+    ConvertFromUtf8 {
         #[structopt(help = "Target encoding name. See the `list` subcommand for supported encodings.")]
         target_encoding_name: String,
     },
-    StreamBetween {
+    ConvertBetween {
         #[structopt(help = "Source encoding name. See the `list` subcommand for supported encodings.")]
         source_encoding_name: String,
         #[structopt(help = "Target encoding name. See the `list` subcommand for supported encodings.")]
@@ -212,24 +214,40 @@ fn main() -> Result<(), Error> {
                 }
             }
         }
-        AppArgs::StreamToUtf8 { source_encoding_name } => {
+        AppArgs::ConvertToUtf8 { source_encoding_name } => {
             let source_encoding_table = encodings::from_str(&source_encoding_name)?;
 
-            todo!();
+            let reader = BufReader::new(io::stdin());
+            let mut writer = BufWriter::new(io::stdout());
+
+            for b in reader.bytes().filter_map(Result::ok) {
+                write!(writer, "{}", source_encoding_table[b as usize]).unwrap();
+            }
         }
-        AppArgs::StreamFromUtf8 { target_encoding_name } => {
+        AppArgs::ConvertFromUtf8 { target_encoding_name } => {
             let target_encoding_table = encodings::from_str(&target_encoding_name)?;
 
+            let reader = BufReader::new(io::stdin());
+            let mut writer = BufWriter::new(io::stdout());
+
+            // TODO: Why BufReader has no .chars() anymore?
             todo!();
         }
-        AppArgs::StreamBetween {
+        AppArgs::ConvertBetween {
             source_encoding_name,
             target_encoding_name,
         } => {
             let source_encoding_table = encodings::from_str(&source_encoding_name)?;
             let target_encoding_table = encodings::from_str(&target_encoding_name)?;
 
-            todo!();
+            let reader = BufReader::new(io::stdin());
+            let mut writer = BufWriter::new(io::stdout());
+
+            for b in reader.bytes().filter_map(Result::ok) {
+                let c = source_encoding_table[b as usize];
+                let b = target_encoding_table.iter().position(|&p| p == c).unwrap_or(0) as u8;
+                writer.write_all(&[b]).unwrap();
+            }
         }
     }
 
