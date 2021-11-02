@@ -2,7 +2,7 @@
 #![feature(iter_intersperse)]
 
 mod encodings;
-use encodings::{max_encoding_name_width, ENCODINGS};
+use encodings::{decode, encode, max_encoding_name_width, ENCODINGS};
 
 mod utils;
 use utils::hexstr_to_vec;
@@ -110,7 +110,7 @@ fn main() -> Result<(), Error> {
 
                 let decoded = bin_string
                     .iter()
-                    .map(|&b| encoding_table[b as usize])
+                    .map(|&b| encodings::decode(encoding_table, b))
                     .collect::<Vec<char>>();
 
                 let score_simple: isize = decoded
@@ -142,7 +142,7 @@ fn main() -> Result<(), Error> {
                     .map(|s| s.chars().count() as isize)
                     .sum();
 
-                let preview_string = bin_string.iter().map(|&b| encoding_table[b as usize]).collect();
+                let preview_string = decoded.iter().collect();
 
                 results.push((encoding_name, score_advanced, preview_string));
             }
@@ -177,7 +177,7 @@ fn main() -> Result<(), Error> {
 
             let result = input
                 .chars()
-                .map(|c| encoding_table.iter().position(|&p| p == c).unwrap_or(0) as u8)
+                .map(|c| encodings::encode(encoding_table, c))
                 .map(|b| format!("{:02X}", b))
                 .intersperse(" ".to_owned())
                 .collect::<String>();
@@ -185,12 +185,12 @@ fn main() -> Result<(), Error> {
             println!("{}", result);
         }
         AppArgs::Showcase { input, hide_uncommon } => {
-            for (src_name, &src_table, src_is_common) in ENCODINGS {
+            for (src_name, src_table, src_is_common) in ENCODINGS {
                 if hide_uncommon && !src_is_common {
                     continue;
                 }
 
-                for (dst_name, &dst_table, dst_is_common) in ENCODINGS {
+                for (dst_name, dst_table, dst_is_common) in ENCODINGS {
                     if hide_uncommon && !dst_is_common {
                         continue;
                     }
@@ -201,7 +201,8 @@ fn main() -> Result<(), Error> {
 
                     let result = input
                         .chars()
-                        .map(|c| dst_table[src_table.iter().position(|&p| p == c).unwrap_or(0)])
+                        .map(|c| encodings::encode(src_table, c))
+                        .map(|b| encodings::decode(dst_table, b))
                         .collect::<String>();
 
                     println!(
@@ -221,7 +222,8 @@ fn main() -> Result<(), Error> {
             let mut writer = BufWriter::new(io::stdout());
 
             for b in reader.bytes().filter_map(Result::ok) {
-                write!(writer, "{}", source_encoding_table[b as usize]).unwrap();
+                let c = encodings::decode(source_encoding_table, b);
+                write!(writer, "{}", c).unwrap();
             }
         }
         AppArgs::ConvertFromUtf8 { target_encoding_name } => {
@@ -244,8 +246,8 @@ fn main() -> Result<(), Error> {
             let mut writer = BufWriter::new(io::stdout());
 
             for b in reader.bytes().filter_map(Result::ok) {
-                let c = source_encoding_table[b as usize];
-                let b = target_encoding_table.iter().position(|&p| p == c).unwrap_or(0) as u8;
+                let c = encodings::decode(source_encoding_table, b);
+                let b = encodings::encode(target_encoding_table, c);
                 writer.write_all(&[b]).unwrap();
             }
         }

@@ -90,6 +90,14 @@ pub fn from_str(name: &str) -> Result<&EncodingTable, Error> {
     Err(Error::UnsupportedEncoding { encoding_name: name })
 }
 
+pub fn encode(encoding_table: &EncodingTable, input: char) -> u8 {
+    encoding_table.iter().position(|&p| p == input).unwrap_or(0) as u8
+}
+
+pub fn decode(encoding_table: &EncodingTable, input: u8) -> char {
+    encoding_table[input as usize]
+}
+
 pub fn supports_charset(encoding_table: &EncodingTable, charset: &[char]) -> bool {
     charset.iter().all(|c| encoding_table.contains(c))
 }
