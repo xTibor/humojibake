@@ -1,10 +1,10 @@
-pub mod convert_between;
-pub mod convert_from_utf8;
-pub mod convert_to_utf8;
-pub mod encode_hex;
-pub mod guess_hex;
-pub mod list;
-pub mod showcase;
+mod convert_between;
+mod convert_from_utf8;
+mod convert_to_utf8;
+mod encode_hex;
+mod guess_hex;
+mod list;
+mod showcase;
 
 use self::convert_between::ConvertBetweenArgs;
 use self::convert_from_utf8::ConvertFromUtf8Args;

@@ -1,4 +1,4 @@
-use super::EncodingTable;
+use crate::encodings::EncodingTable;
 
 #[rustfmt::skip]
 pub const ENCODING_CP1250: &EncodingTable = &[

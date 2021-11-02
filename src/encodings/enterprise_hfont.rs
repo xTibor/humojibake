@@ -1,4 +1,4 @@
-use super::EncodingTable;
+use crate::encodings::EncodingTable;
 
 #[rustfmt::skip]
 pub const ENCODING_ENTERPRISE_HFONT: &EncodingTable = &[
