@@ -1,6 +1,6 @@
-use strum::{EnumString, EnumVariantNames};
+use strum::{Display, EnumIter, EnumString, EnumVariantNames};
 
-#[derive(EnumString, EnumVariantNames)]
+#[derive(Copy, Clone, Display, EnumIter, EnumString, EnumVariantNames)]
 #[strum(serialize_all = "kebab_case")]
 pub enum Language {
     Hungarian,
