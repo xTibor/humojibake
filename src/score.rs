@@ -45,4 +45,7 @@ fn score_strategy_advanced(charset: &[char], input: &[char]) -> isize {
         // Cumulative length of the remaining words
         .map(|word| word.len() as isize)
         .sum()
+    // TODO: Things to explore here:
+    //   Boost the score of words with several non-ASCII characters
+    //   Make the score grow non-linearly with the length of the words
 }
