@@ -24,6 +24,7 @@ use strum::{Display, EnumIter, EnumString, EnumVariantNames, VariantNames};
 pub type EncodingTable = [char; 256];
 
 #[derive(Display, EnumIter, EnumString, EnumVariantNames, Eq, PartialEq)]
+#[strum(ascii_case_insensitive)]
 pub enum Encoding {
     #[strum(serialize = "CORK")]
     CORK,
@@ -125,6 +126,7 @@ impl Encoding {
     }
 
     pub fn is_common(&self) -> bool {
+        // TODO
         true
     }
 
