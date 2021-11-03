@@ -23,8 +23,7 @@ impl Subcommand for ConvertToUtf8Args {
         let reader = BufReader::new(io::stdin());
         let mut writer = BufWriter::new(io::stdout());
 
-        for b in reader.bytes().filter_map(Result::ok) {
-            let c = source_encoding.decode(b);
+        for c in reader.bytes().filter_map(Result::ok).map(|b| source_encoding.decode(b)) {
             write!(writer, "{}", c)?;
         }
 

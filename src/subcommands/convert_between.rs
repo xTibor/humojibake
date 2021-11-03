@@ -31,9 +31,12 @@ impl Subcommand for ConvertBetweenArgs {
         let reader = BufReader::new(io::stdin());
         let mut writer = BufWriter::new(io::stdout());
 
-        for b in reader.bytes().filter_map(Result::ok) {
-            let c = source_encoding.decode(b);
-            let b = target_encoding.encode(c);
+        for b in reader
+            .bytes()
+            .filter_map(Result::ok)
+            .map(|b| source_encoding.decode(b))
+            .map(|c| target_encoding.encode(c))
+        {
             writer.write_all(&[b])?;
         }
 
