@@ -1,6 +1,7 @@
 use structopt::StructOpt;
+use strum::IntoEnumIterator;
 
-use crate::encodings::{self, ENCODINGS};
+use crate::encodings::Encoding;
 use crate::language::Language;
 use crate::subcommands::Subcommand;
 
@@ -14,14 +15,13 @@ pub struct SupportedEncodingsArgs {
 
 impl Subcommand for SupportedEncodingsArgs {
     fn execute(&self) -> Result<(), crate::error::Error> {
-        ENCODINGS
-            .iter()
-            .filter(|(_, encoding_table, _)| {
+        Encoding::iter()
+            .filter(|encoding| {
                 self.languages
                     .iter()
-                    .all(|lang| encodings::supports_charset(encoding_table, lang.get_charset()))
+                    .all(|language| encoding.supports_charset(language.get_charset()))
             })
-            .for_each(|(encoding_name, _, _)| println!("{}", encoding_name));
+            .for_each(|encoding| println!("{}", encoding));
 
         Ok(())
     }

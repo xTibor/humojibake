@@ -1,6 +1,9 @@
+use std::str::FromStr;
+
 use structopt::StructOpt;
 
-use crate::encodings;
+use crate::encodings::Encoding;
+use crate::error::Error;
 use crate::subcommands::Subcommand;
 
 #[derive(StructOpt)]
@@ -14,12 +17,15 @@ pub struct EncodeHexArgs {
 
 impl Subcommand for EncodeHexArgs {
     fn execute(&self) -> Result<(), crate::error::Error> {
-        let encoding_table = encodings::from_str(&self.target_encoding_name)?;
+        let target_encoding =
+            Encoding::from_str(&self.target_encoding_name).map_err(|_| Error::UnsupportedEncoding {
+                encoding_name: self.target_encoding_name.clone(),
+            })?;
 
         let result = self
             .input
             .chars()
-            .map(|c| encodings::encode(encoding_table, c))
+            .map(|c| target_encoding.encode(c))
             .map(|b| format!("{:02X}", b))
             .intersperse(" ".to_owned())
             .collect::<String>();

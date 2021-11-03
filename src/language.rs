@@ -1,6 +1,6 @@
-use strum::{Display, EnumIter, EnumString, EnumVariantNames};
+use strum::{Display, EnumIter, EnumString, EnumVariantNames, VariantNames};
 
-#[derive(Copy, Clone, Display, EnumIter, EnumString, EnumVariantNames)]
+#[derive(Copy, Clone, Display, EnumIter, EnumString, EnumVariantNames, Eq, PartialEq)]
 #[strum(serialize_all = "kebab_case")]
 pub enum Language {
     Hungarian,
@@ -106,5 +106,9 @@ impl Language {
                 'я',
             ],
         }
+    }
+
+    pub fn max_language_name_width() -> usize {
+        Self::VARIANTS.iter().map(|name| name.len()).max().unwrap_or(0)
     }
 }

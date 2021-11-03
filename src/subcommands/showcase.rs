@@ -1,6 +1,7 @@
 use structopt::StructOpt;
+use strum::IntoEnumIterator;
 
-use crate::encodings::{self, max_encoding_name_width, ENCODINGS};
+use crate::encodings::Encoding;
 use crate::subcommands::Subcommand;
 
 #[derive(StructOpt)]
@@ -17,33 +18,33 @@ pub struct ShowcaseArgs {
 
 impl Subcommand for ShowcaseArgs {
     fn execute(&self) -> Result<(), crate::error::Error> {
-        for (src_name, src_table, src_is_common) in ENCODINGS {
-            if self.hide_uncommon && !src_is_common {
+        for source_encoding in Encoding::iter() {
+            if self.hide_uncommon && !source_encoding.is_common() {
                 continue;
             }
 
-            for (dst_name, dst_table, dst_is_common) in ENCODINGS {
-                if self.hide_uncommon && !dst_is_common {
+            for target_encoding in Encoding::iter() {
+                if self.hide_uncommon && !target_encoding.is_common() {
                     continue;
                 }
 
-                if src_table == dst_table {
+                if source_encoding == target_encoding {
                     continue;
                 }
 
                 let result = self
                     .input
                     .chars()
-                    .map(|c| encodings::encode(src_table, c))
-                    .map(|b| encodings::decode(dst_table, b))
+                    .map(|c| source_encoding.encode(c))
+                    .map(|b| target_encoding.decode(b))
                     .collect::<String>();
 
                 println!(
                     "{:encoding_name_width$} {:encoding_name_width$} \"{}\"",
-                    src_name,
-                    dst_name,
+                    source_encoding,
+                    target_encoding,
                     result,
-                    encoding_name_width = max_encoding_name_width()
+                    encoding_name_width = Encoding::max_encoding_name_width()
                 );
             }
         }
