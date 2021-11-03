@@ -7,7 +7,7 @@ use crate::subcommands::Subcommand;
 
 #[derive(StructOpt)]
 pub struct ConvertFromUtf8Args {
-    #[structopt(help = "Target encoding name. See the `list-encodings` subcommand for supported encodings.")]
+    #[structopt(help = "Target encoding name. See the `supported-encodings` subcommand for supported encodings.")]
     pub target_encoding_name: String,
 }
 
