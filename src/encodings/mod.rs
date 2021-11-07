@@ -23,6 +23,11 @@ use strum::{Display, EnumIter, EnumString, EnumVariantNames, VariantNames};
 
 pub type EncodingTable = [char; 256];
 
+pub struct EncodingDefinition {
+    pub encoding_table: EncodingTable,
+    pub is_common: bool,
+}
+
 #[derive(Display, EnumIter, EnumString, EnumVariantNames, Eq, PartialEq)]
 #[strum(ascii_case_insensitive)]
 pub enum Encoding {
@@ -88,28 +93,28 @@ pub enum Encoding {
 }
 
 impl Encoding {
-    pub fn get_encoding_table(&self) -> &EncodingTable {
+    pub fn encoding_definition(&self) -> &EncodingDefinition {
         match self {
-            Self::CORK => cork::ENCODING_CORK,
-            Self::CP1250 => cp1250::ENCODING_CP1250,
-            Self::CP1252 => cp1252::ENCODING_CP1252,
-            Self::CP254 => cp254::ENCODING_CP254,
-            Self::CP320 => cp320::ENCODING_CP320,
-            Self::CP437 => cp437::ENCODING_CP437,
-            Self::CP850 => cp850::ENCODING_CP850,
-            Self::CP852 => cp852::ENCODING_CP852,
-            Self::CWI1 => cwi1::ENCODING_CWI1,
-            Self::CWI2 => cwi2::ENCODING_CWI2,
-            Self::EnterpriseHfont => enterprise_hfont::ENCODING_ENTERPRISE_HFONT,
-            Self::EnterpriseHun => enterprise_hun::ENCODING_ENTERPRISE_HUN,
-            Self::EnterprisePlusHun => enterprise_plus_hun::ENCODING_ENTERPRISE_PLUS_HUN,
-            Self::ISO646HU => iso646hu::ENCODING_ISO646HU,
-            Self::ISO88591 => iso88591::ENCODING_ISO88591,
-            Self::ISO88592 => iso88592::ENCODING_ISO88592,
-            Self::MacCenteuro => mac_centeuro::ENCODING_MAC_CENTEURO,
-            Self::MacRoman => mac_roman::ENCODING_MAC_ROMAN,
-            Self::SZKI => szki::ENCODING_SZKI,
-            Self::TVC => tvc::ENCODING_TVC,
+            Self::CORK => &cork::ENCODING_CORK,
+            Self::CP1250 => &cp1250::ENCODING_CP1250,
+            Self::CP1252 => &cp1252::ENCODING_CP1252,
+            Self::CP254 => &cp254::ENCODING_CP254,
+            Self::CP320 => &cp320::ENCODING_CP320,
+            Self::CP437 => &cp437::ENCODING_CP437,
+            Self::CP850 => &cp850::ENCODING_CP850,
+            Self::CP852 => &cp852::ENCODING_CP852,
+            Self::CWI1 => &cwi1::ENCODING_CWI1,
+            Self::CWI2 => &cwi2::ENCODING_CWI2,
+            Self::EnterpriseHfont => &enterprise_hfont::ENCODING_ENTERPRISE_HFONT,
+            Self::EnterpriseHun => &enterprise_hun::ENCODING_ENTERPRISE_HUN,
+            Self::EnterprisePlusHun => &enterprise_plus_hun::ENCODING_ENTERPRISE_PLUS_HUN,
+            Self::ISO646HU => &iso646hu::ENCODING_ISO646HU,
+            Self::ISO88591 => &iso88591::ENCODING_ISO88591,
+            Self::ISO88592 => &iso88592::ENCODING_ISO88592,
+            Self::MacCenteuro => &mac_centeuro::ENCODING_MAC_CENTEURO,
+            Self::MacRoman => &mac_roman::ENCODING_MAC_ROMAN,
+            Self::SZKI => &szki::ENCODING_SZKI,
+            Self::TVC => &tvc::ENCODING_TVC,
         }
     }
 
@@ -122,19 +127,23 @@ impl Encoding {
     }
 
     pub fn supports_charset(&self, charset: &[char]) -> bool {
-        charset.iter().all(|c| self.get_encoding_table().contains(c))
+        let encoding_table = self.encoding_definition().encoding_table;
+        charset.iter().all(|c| encoding_table.contains(c))
     }
 
     pub fn is_common(&self) -> bool {
-        // TODO
-        true
+        self.encoding_definition().is_common
     }
 
     pub fn encode(&self, input: char) -> u8 {
-        self.get_encoding_table().iter().position(|&p| p == input).unwrap_or(0) as u8
+        self.encoding_definition()
+            .encoding_table
+            .iter()
+            .position(|&p| p == input)
+            .unwrap_or(0) as u8
     }
 
     pub fn decode(&self, input: u8) -> char {
-        self.get_encoding_table()[input as usize]
+        self.encoding_definition().encoding_table[input as usize]
     }
 }
