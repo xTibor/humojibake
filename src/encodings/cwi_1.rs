@@ -1,7 +1,7 @@
 use crate::encodings::EncodingDefinition;
 
 #[rustfmt::skip]
-pub const ENCODING_CWI2: EncodingDefinition = EncodingDefinition {
+pub const ENCODING_CWI_1: EncodingDefinition = EncodingDefinition {
     encoding_table: [
         '\u{0000}', '\u{263A}', '\u{263B}', '\u{2665}', '\u{2666}', '\u{2663}', '\u{2660}', '\u{2022}', // 0x00 - 0x07
         '\u{25D8}', '\u{25CB}', '\u{25D9}', '\u{2642}', '\u{2640}', '\u{266A}', '\u{266B}', '\u{263C}', // 0x08 - 0x0F
@@ -21,7 +21,7 @@ pub const ENCODING_CWI2: EncodingDefinition = EncodingDefinition {
         '\u{0078}', '\u{0079}', '\u{007A}', '\u{007B}', '\u{007C}', '\u{007D}', '\u{007E}', '\u{007F}', // 0x78 - 0x7F
 
         '\u{00C7}', '\u{00FC}', '\u{00E9}', '\u{00E2}', '\u{00E4}', '\u{00E0}', '\u{00E5}', '\u{00E7}', // 0x80 - 0x87
-        '\u{00EA}', '\u{00EB}', '\u{00E8}', '\u{00EF}', '\u{00EE}', '\u{00CD}', '\u{00C4}', '\u{00C1}', // 0x88 - 0x8F
+        '\u{00EA}', '\u{00EB}', '\u{00E8}', '\u{00EF}', '\u{00CD}', '\u{00EC}', '\u{00C4}', '\u{00C1}', // 0x88 - 0x8F
         '\u{00C9}', '\u{00E6}', '\u{00C6}', '\u{0151}', '\u{00F6}', '\u{00D3}', '\u{0171}', '\u{00DA}', // 0x90 - 0x97
         '\u{0170}', '\u{00D6}', '\u{00DC}', '\u{00A2}', '\u{00A3}', '\u{00A5}', '\u{20A7}', '\u{0192}', // 0x98 - 0x9F
         '\u{00E1}', '\u{00ED}', '\u{00F3}', '\u{00FA}', '\u{00F1}', '\u{00D1}', '\u{00AA}', '\u{0150}', // 0xA0 - 0xA7
@@ -37,5 +37,5 @@ pub const ENCODING_CWI2: EncodingDefinition = EncodingDefinition {
         '\u{2261}', '\u{00B1}', '\u{2265}', '\u{2264}', '\u{2320}', '\u{2321}', '\u{00F7}', '\u{2248}', // 0xF0 - 0xF7
         '\u{00B0}', '\u{2219}', '\u{00B7}', '\u{221A}', '\u{207F}', '\u{00B2}', '\u{25A0}', '\u{00A0}', // 0xF8 - 0xFF
     ],
-    is_common: true,
+    is_common: false,
 };

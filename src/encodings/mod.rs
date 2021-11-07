@@ -1,23 +1,23 @@
 mod cork;
-mod cp1250;
-mod cp1252;
 mod cp254;
 mod cp320;
 mod cp437;
 mod cp850;
 mod cp852;
-mod cwi1;
-mod cwi2;
-mod enterprise_hfont;
-mod enterprise_hun;
-mod enterprise_plus_hun;
-mod iso646hu;
-mod iso88591;
-mod iso88592;
+mod cwi_1;
+mod cwi_2;
+mod ep_hfont;
+mod ep_hun;
+mod ep_plus_hun;
+mod iso_646_hu;
+mod iso_8859_1;
+mod iso_8859_2;
 mod mac_centeuro;
 mod mac_roman;
 mod szki;
 mod tvc;
+mod windows_1250;
+mod windows_1252;
 
 use strum::{Display, EnumIter, EnumString, EnumVariantNames, VariantNames};
 
@@ -28,93 +28,55 @@ pub struct EncodingDefinition {
     pub is_common: bool,
 }
 
+#[allow(non_camel_case_types)]
 #[derive(Display, EnumIter, EnumString, EnumVariantNames, Eq, PartialEq)]
-#[strum(ascii_case_insensitive)]
+#[strum(serialize_all = "SCREAMING-KEBAB-CASE", ascii_case_insensitive)]
 pub enum Encoding {
-    #[strum(serialize = "CORK")]
     CORK,
-
-    #[strum(serialize = "CP1250")]
-    CP1250,
-
-    #[strum(serialize = "CP1252")]
-    CP1252,
-
-    #[strum(serialize = "CP254")]
     CP254,
-
-    #[strum(serialize = "CP320")]
     CP320,
-
-    #[strum(serialize = "CP437")]
     CP437,
-
-    #[strum(serialize = "CP850")]
     CP850,
-
-    #[strum(serialize = "CP852")]
     CP852,
-
-    #[strum(serialize = "CWI-1")]
-    CWI1,
-
-    #[strum(serialize = "CWI-2")]
-    CWI2,
-
-    #[strum(serialize = "EP-HFONT")]
-    EnterpriseHfont,
-
-    #[strum(serialize = "EP-HUN")]
-    EnterpriseHun,
-
-    #[strum(serialize = "EP-PLUS-HUN")]
-    EnterprisePlusHun,
-
-    #[strum(serialize = "ISO-646-HU")]
-    ISO646HU,
-
-    #[strum(serialize = "ISO-8859-1")]
-    ISO88591,
-
-    #[strum(serialize = "ISO-8859-2")]
-    ISO88592,
-
-    #[strum(serialize = "MAC-CENTEURO")]
-    MacCenteuro,
-
-    #[strum(serialize = "MAC-ROMAN")]
-    MacRoman,
-
-    #[strum(serialize = "SZKI")]
+    CWI_1,
+    CWI_2,
+    EP_HFONT,
+    EP_HUN,
+    EP_PLUS_HUN,
+    ISO_646_HU,
+    ISO_8859_1,
+    ISO_8859_2,
+    MAC_CENTEURO,
+    MAC_ROMAN,
     SZKI,
-
-    #[strum(serialize = "TVC")]
     TVC,
+    WINDOWS_1250,
+    WINDOWS_1252,
 }
 
 impl Encoding {
     pub fn encoding_definition(&self) -> &EncodingDefinition {
         match self {
             Self::CORK => &cork::ENCODING_CORK,
-            Self::CP1250 => &cp1250::ENCODING_CP1250,
-            Self::CP1252 => &cp1252::ENCODING_CP1252,
             Self::CP254 => &cp254::ENCODING_CP254,
             Self::CP320 => &cp320::ENCODING_CP320,
             Self::CP437 => &cp437::ENCODING_CP437,
             Self::CP850 => &cp850::ENCODING_CP850,
             Self::CP852 => &cp852::ENCODING_CP852,
-            Self::CWI1 => &cwi1::ENCODING_CWI1,
-            Self::CWI2 => &cwi2::ENCODING_CWI2,
-            Self::EnterpriseHfont => &enterprise_hfont::ENCODING_ENTERPRISE_HFONT,
-            Self::EnterpriseHun => &enterprise_hun::ENCODING_ENTERPRISE_HUN,
-            Self::EnterprisePlusHun => &enterprise_plus_hun::ENCODING_ENTERPRISE_PLUS_HUN,
-            Self::ISO646HU => &iso646hu::ENCODING_ISO646HU,
-            Self::ISO88591 => &iso88591::ENCODING_ISO88591,
-            Self::ISO88592 => &iso88592::ENCODING_ISO88592,
-            Self::MacCenteuro => &mac_centeuro::ENCODING_MAC_CENTEURO,
-            Self::MacRoman => &mac_roman::ENCODING_MAC_ROMAN,
+            Self::CWI_1 => &cwi_1::ENCODING_CWI_1,
+            Self::CWI_2 => &cwi_2::ENCODING_CWI_2,
+            Self::EP_HFONT => &ep_hfont::ENCODING_EP_HFONT,
+            Self::EP_HUN => &ep_hun::ENCODING_EP_HUN,
+            Self::EP_PLUS_HUN => &ep_plus_hun::ENCODING_EP_PLUS_HUN,
+            Self::ISO_646_HU => &iso_646_hu::ENCODING_ISO_646_HU,
+            Self::ISO_8859_1 => &iso_8859_1::ENCODING_ISO_8859_1,
+            Self::ISO_8859_2 => &iso_8859_2::ENCODING_ISO_8859_2,
+            Self::MAC_CENTEURO => &mac_centeuro::ENCODING_MAC_CENTEURO,
+            Self::MAC_ROMAN => &mac_roman::ENCODING_MAC_ROMAN,
             Self::SZKI => &szki::ENCODING_SZKI,
             Self::TVC => &tvc::ENCODING_TVC,
+            Self::WINDOWS_1250 => &windows_1250::ENCODING_WINDOWS_1250,
+            Self::WINDOWS_1252 => &windows_1252::ENCODING_WINDOWS_1252,
         }
     }
 

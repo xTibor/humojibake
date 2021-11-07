@@ -1,7 +1,7 @@
 use crate::encodings::EncodingDefinition;
 
 #[rustfmt::skip]
-pub const ENCODING_CP1250: EncodingDefinition = EncodingDefinition {
+pub const ENCODING_WINDOWS_1250: EncodingDefinition = EncodingDefinition {
     encoding_table: [
         '\u{0000}', '\u{0001}', '\u{0002}', '\u{0003}', '\u{0004}', '\u{0005}', '\u{0006}', '\u{0007}', // 0x00 - 0x07
         '\u{0008}', '\u{0009}', '\u{000A}', '\u{000B}', '\u{000C}', '\u{000D}', '\u{000E}', '\u{000F}', // 0x08 - 0x0F
