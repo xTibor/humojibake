@@ -23,14 +23,18 @@ pub struct GuessHexArgs {
 
     #[structopt(long, help = "Guess scoring strategy", default_value = "advanced")]
     pub score_strategy: ScoreStrategy,
-    /* TODO: Turn this into a filter
-        #[structopt(
-            long,
-            help = "Language the guess is based on. See the `list-languages` subcommand for supported languages.",
-            default_value = "hungarian"
-        )]
-        pub language: Language,
-    */
+
+    #[structopt(
+        long,
+        help = "Filter guesses to these languages. See the `list-languages` subcommand for supported languages."
+    )]
+    pub filter_language: Option<Vec<Language>>,
+
+    #[structopt(
+        long,
+        help = "Filter guesses to these encodings. See the `list-encodings` subcommand for supported encodings."
+    )]
+    pub filter_encoding: Option<Vec<Encoding>>,
 }
 
 impl Subcommand for GuessHexArgs {
@@ -40,7 +44,19 @@ impl Subcommand for GuessHexArgs {
         let mut results: Vec<(Language, Encoding, isize, String)> = Vec::new();
 
         for language in Language::iter() {
+            if let Some(filter_language) = &self.filter_language {
+                if !filter_language.contains(&language) {
+                    continue;
+                }
+            }
+
             for encoding in Encoding::iter() {
+                if let Some(filter_encoding) = &self.filter_encoding {
+                    if !filter_encoding.contains(&encoding) {
+                        continue;
+                    }
+                }
+
                 if !encoding.supports_charset(language.get_charset()) && !self.show_incompatible {
                     continue;
                 }
