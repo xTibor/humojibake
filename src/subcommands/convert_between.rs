@@ -1,5 +1,4 @@
 use std::io::{self, BufReader, BufWriter, Read, Write};
-use std::str::FromStr;
 
 use structopt::StructOpt;
 
@@ -10,32 +9,22 @@ use crate::subcommands::Subcommand;
 #[derive(StructOpt)]
 pub struct ConvertBetweenArgs {
     #[structopt(help = "Source encoding name. See the `supported-encodings` subcommand for supported encodings.")]
-    pub source_encoding_name: String,
+    pub source_encoding: Encoding,
 
     #[structopt(help = "Target encoding name. See the `supported-encodings` subcommand for supported encodings.")]
-    pub target_encoding_name: String,
+    pub target_encoding: Encoding,
 }
 
 impl Subcommand for ConvertBetweenArgs {
     fn execute(&self) -> Result<(), Error> {
-        let source_encoding =
-            Encoding::from_str(&self.source_encoding_name).map_err(|_| Error::UnsupportedEncoding {
-                encoding_name: self.source_encoding_name.clone(),
-            })?;
-
-        let target_encoding =
-            Encoding::from_str(&self.target_encoding_name).map_err(|_| Error::UnsupportedEncoding {
-                encoding_name: self.target_encoding_name.clone(),
-            })?;
-
         let reader = BufReader::new(io::stdin());
         let mut writer = BufWriter::new(io::stdout());
 
         for b in reader
             .bytes()
             .filter_map(Result::ok)
-            .decode(source_encoding)
-            .encode(target_encoding)
+            .decode(self.source_encoding)
+            .encode(self.target_encoding)
         {
             writer.write_all(&[b])?;
         }
