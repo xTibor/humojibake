@@ -1,7 +1,8 @@
-use std::io::{self, BufReader, BufWriter};
+use std::io::{self, BufReader, BufWriter, Write};
 use std::str::FromStr;
 
 use structopt::StructOpt;
+use utf8_chars::BufReadCharsExt;
 
 use crate::encodings::Encoding;
 use crate::error::Error;
@@ -20,10 +21,13 @@ impl Subcommand for ConvertFromUtf8Args {
                 encoding_name: self.target_encoding_name.clone(),
             })?;
 
-        let reader = BufReader::new(io::stdin());
+        let mut reader = BufReader::new(io::stdin());
         let mut writer = BufWriter::new(io::stdout());
 
-        // TODO: Why BufReader has no .chars() anymore?
-        todo!();
+        for b in reader.chars().filter_map(Result::ok).map(|c| target_encoding.encode(c)) {
+            writer.write_all(&[b])?;
+        }
+
+        Ok(())
     }
 }
