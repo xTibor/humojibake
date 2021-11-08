@@ -16,7 +16,7 @@ pub struct EncodeHexArgs {
 }
 
 impl Subcommand for EncodeHexArgs {
-    fn execute(&self) -> Result<(), crate::error::Error> {
+    fn execute(&self) -> Result<(), Error> {
         let target_encoding =
             Encoding::from_str(&self.target_encoding_name).map_err(|_| Error::UnsupportedEncoding {
                 encoding_name: self.target_encoding_name.clone(),

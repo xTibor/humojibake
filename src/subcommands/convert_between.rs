@@ -17,7 +17,7 @@ pub struct ConvertBetweenArgs {
 }
 
 impl Subcommand for ConvertBetweenArgs {
-    fn execute(&self) -> Result<(), crate::error::Error> {
+    fn execute(&self) -> Result<(), Error> {
         let source_encoding =
             Encoding::from_str(&self.source_encoding_name).map_err(|_| Error::UnsupportedEncoding {
                 encoding_name: self.source_encoding_name.clone(),

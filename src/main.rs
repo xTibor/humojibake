@@ -1,4 +1,3 @@
-//#![allow(unused)]
 #![feature(iter_intersperse)]
 
 mod encodings;

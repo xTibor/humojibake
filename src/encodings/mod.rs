@@ -29,6 +29,7 @@ pub struct EncodingDefinition {
 }
 
 #[allow(non_camel_case_types)]
+#[allow(clippy::upper_case_acronyms)]
 #[derive(Display, EnumIter, EnumString, EnumVariantNames, Eq, PartialEq)]
 #[strum(serialize_all = "SCREAMING-KEBAB-CASE", ascii_case_insensitive)]
 pub enum Encoding {

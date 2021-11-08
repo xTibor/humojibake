@@ -2,6 +2,7 @@ use structopt::StructOpt;
 use strum::IntoEnumIterator;
 
 use crate::encodings::Encoding;
+use crate::error::Error;
 use crate::subcommands::Subcommand;
 
 #[derive(StructOpt)]
@@ -17,7 +18,7 @@ pub struct ShowcaseArgs {
 }
 
 impl Subcommand for ShowcaseArgs {
-    fn execute(&self) -> Result<(), crate::error::Error> {
+    fn execute(&self) -> Result<(), Error> {
         for source_encoding in Encoding::iter() {
             if self.hide_uncommon && !source_encoding.is_common() {
                 continue;

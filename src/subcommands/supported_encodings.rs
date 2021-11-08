@@ -2,6 +2,7 @@ use structopt::StructOpt;
 use strum::IntoEnumIterator;
 
 use crate::encodings::Encoding;
+use crate::error::Error;
 use crate::language::Language;
 use crate::subcommands::Subcommand;
 
@@ -14,7 +15,7 @@ pub struct SupportedEncodingsArgs {
 }
 
 impl Subcommand for SupportedEncodingsArgs {
-    fn execute(&self) -> Result<(), crate::error::Error> {
+    fn execute(&self) -> Result<(), Error> {
         Encoding::iter()
             .filter(|encoding| {
                 self.languages

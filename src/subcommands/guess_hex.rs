@@ -2,6 +2,7 @@ use structopt::StructOpt;
 use strum::IntoEnumIterator;
 
 use crate::encodings::Encoding;
+use crate::error::Error;
 use crate::language::Language;
 use crate::score::ScoreStrategy;
 use crate::subcommands::Subcommand;
@@ -38,7 +39,7 @@ pub struct GuessHexArgs {
 }
 
 impl Subcommand for GuessHexArgs {
-    fn execute(&self) -> Result<(), crate::error::Error> {
+    fn execute(&self) -> Result<(), Error> {
         let bin_string = hexstr_to_vec(&self.input)?;
 
         let mut results: Vec<(Language, Encoding, isize, String)> = Vec::new();
