@@ -1,7 +1,7 @@
 use strum::{Display, EnumIter, EnumString, EnumVariantNames, VariantNames};
 
 #[derive(Copy, Clone, Display, EnumIter, EnumString, EnumVariantNames, Eq, PartialEq)]
-#[strum(serialize_all = "kebab_case", ascii_case_insensitive)]
+#[strum(serialize_all = "kebab-case", ascii_case_insensitive)]
 pub enum Language {
     Hungarian,
     Croatian,
