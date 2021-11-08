@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use structopt::StructOpt;
 
-use crate::encodings::Encoding;
+use crate::encodings::{Encoder, Encoding};
 use crate::error::Error;
 use crate::subcommands::Subcommand;
 
@@ -25,7 +25,7 @@ impl Subcommand for EncodeHexArgs {
         let result = self
             .input
             .chars()
-            .map(|c| target_encoding.encode(c))
+            .encode(target_encoding)
             .map(|b| format!("{:02X}", b))
             .intersperse(" ".to_owned())
             .collect::<String>();

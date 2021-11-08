@@ -4,7 +4,7 @@ use std::str::FromStr;
 use structopt::StructOpt;
 use utf8_chars::BufReadCharsExt;
 
-use crate::encodings::Encoding;
+use crate::encodings::{Encoder, Encoding};
 use crate::error::Error;
 use crate::subcommands::Subcommand;
 
@@ -24,7 +24,7 @@ impl Subcommand for ConvertFromUtf8Args {
         let mut reader = BufReader::new(io::stdin());
         let mut writer = BufWriter::new(io::stdout());
 
-        for b in reader.chars().filter_map(Result::ok).map(|c| target_encoding.encode(c)) {
+        for b in reader.chars().filter_map(Result::ok).encode(target_encoding) {
             writer.write_all(&[b])?;
         }
 

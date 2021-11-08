@@ -1,7 +1,7 @@
 use structopt::StructOpt;
 use strum::IntoEnumIterator;
 
-use crate::encodings::Encoding;
+use crate::encodings::{Decoder, Encoder, Encoding};
 use crate::error::Error;
 use crate::subcommands::Subcommand;
 
@@ -36,8 +36,8 @@ impl Subcommand for ShowcaseArgs {
                 let result = self
                     .input
                     .chars()
-                    .map(|c| source_encoding.encode(c))
-                    .map(|b| target_encoding.decode(b))
+                    .encode(source_encoding)
+                    .decode(target_encoding)
                     .collect::<String>();
 
                 println!(

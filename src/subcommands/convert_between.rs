@@ -3,7 +3,7 @@ use std::str::FromStr;
 
 use structopt::StructOpt;
 
-use crate::encodings::Encoding;
+use crate::encodings::{Decoder, Encoder, Encoding};
 use crate::error::Error;
 use crate::subcommands::Subcommand;
 
@@ -34,8 +34,8 @@ impl Subcommand for ConvertBetweenArgs {
         for b in reader
             .bytes()
             .filter_map(Result::ok)
-            .map(|b| source_encoding.decode(b))
-            .map(|c| target_encoding.encode(c))
+            .decode(source_encoding)
+            .encode(target_encoding)
         {
             writer.write_all(&[b])?;
         }

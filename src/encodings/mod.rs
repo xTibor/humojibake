@@ -30,7 +30,7 @@ pub struct EncodingDefinition {
 
 #[allow(non_camel_case_types)]
 #[allow(clippy::upper_case_acronyms)]
-#[derive(Display, EnumIter, EnumString, EnumVariantNames, Eq, PartialEq)]
+#[derive(Copy, Clone, Display, EnumIter, EnumString, EnumVariantNames, Eq, PartialEq)]
 #[strum(serialize_all = "SCREAMING-KEBAB-CASE", ascii_case_insensitive)]
 pub enum Encoding {
     CORK,
@@ -108,5 +108,33 @@ impl Encoding {
 
     pub fn decode(&self, input: u8) -> char {
         self.encoding_definition().encoding_table[input as usize]
+    }
+}
+
+pub trait Encoder<'a> {
+    fn encode(self, encoding: Encoding) -> Box<dyn Iterator<Item = u8> + 'a>;
+}
+
+impl<'a, T, F> Encoder<'a> for T
+where
+    T: Iterator<Item = F> + 'a,
+    F: std::borrow::Borrow<char>,
+{
+    fn encode(self, encoding: Encoding) -> Box<dyn Iterator<Item = u8> + 'a> {
+        Box::new(self.map(move |c| encoding.encode(*c.borrow())))
+    }
+}
+
+pub trait Decoder<'a> {
+    fn decode(self, encoding: Encoding) -> Box<dyn Iterator<Item = char> + 'a>;
+}
+
+impl<'a, T, F> Decoder<'a> for T
+where
+    T: Iterator<Item = F> + 'a,
+    F: std::borrow::Borrow<u8>,
+{
+    fn decode(self, encoding: Encoding) -> Box<dyn Iterator<Item = char> + 'a> {
+        Box::new(self.map(move |b| encoding.decode(*b.borrow())))
     }
 }

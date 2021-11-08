@@ -3,7 +3,7 @@ use std::str::FromStr;
 
 use structopt::StructOpt;
 
-use crate::encodings::Encoding;
+use crate::encodings::{Decoder, Encoding};
 use crate::error::Error;
 use crate::subcommands::Subcommand;
 
@@ -23,7 +23,7 @@ impl Subcommand for ConvertToUtf8Args {
         let reader = BufReader::new(io::stdin());
         let mut writer = BufWriter::new(io::stdout());
 
-        for c in reader.bytes().filter_map(Result::ok).map(|b| source_encoding.decode(b)) {
+        for c in reader.bytes().filter_map(Result::ok).decode(source_encoding) {
             write!(writer, "{}", c)?;
         }
 

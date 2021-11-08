@@ -1,7 +1,7 @@
 use structopt::StructOpt;
 use strum::IntoEnumIterator;
 
-use crate::encodings::Encoding;
+use crate::encodings::{Decoder, Encoding};
 use crate::error::Error;
 use crate::language::Language;
 use crate::score::ScoreStrategy;
@@ -66,7 +66,7 @@ impl Subcommand for GuessHexArgs {
                     continue;
                 }
 
-                let decoded = bin_string.iter().map(|&b| encoding.decode(b)).collect::<Vec<char>>();
+                let decoded = bin_string.iter().decode(encoding).collect::<Vec<char>>();
 
                 let score = self.score_strategy.eval(language.get_charset(), &decoded);
                 let preview_string = decoded.iter().collect();
