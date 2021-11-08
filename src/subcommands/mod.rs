@@ -3,6 +3,7 @@ mod convert_from_utf8;
 mod convert_to_utf8;
 mod encode_hex;
 mod guess_hex;
+mod histogram;
 mod showcase;
 mod supported_encodings;
 mod supported_languages;
@@ -12,6 +13,7 @@ use self::convert_from_utf8::ConvertFromUtf8Args;
 use self::convert_to_utf8::ConvertToUtf8Args;
 use self::encode_hex::EncodeHexArgs;
 use self::guess_hex::GuessHexArgs;
+use self::histogram::HistogramArgs;
 use self::showcase::ShowcaseArgs;
 use self::supported_encodings::SupportedEncodingsArgs;
 use self::supported_languages::SupportedLanguagesArgs;
@@ -31,6 +33,7 @@ pub enum SubcommandArgs {
     ConvertToUtf8(ConvertToUtf8Args),
     EncodeHex(EncodeHexArgs),
     GuessHex(GuessHexArgs),
+    Histogram(HistogramArgs),
     Showcase(ShowcaseArgs),
     SupportedEncodings(SupportedEncodingsArgs),
     SupportedLanguages(SupportedLanguagesArgs),
@@ -44,6 +47,7 @@ impl Subcommand for SubcommandArgs {
             SubcommandArgs::ConvertToUtf8(args) => args.execute(),
             SubcommandArgs::EncodeHex(args) => args.execute(),
             SubcommandArgs::GuessHex(args) => args.execute(),
+            SubcommandArgs::Histogram(args) => args.execute(),
             SubcommandArgs::Showcase(args) => args.execute(),
             SubcommandArgs::SupportedEncodings(args) => args.execute(),
             SubcommandArgs::SupportedLanguages(args) => args.execute(),
