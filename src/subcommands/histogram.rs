@@ -5,7 +5,7 @@ use structopt::StructOpt;
 use crate::encodings::Encoding;
 use crate::error::Error;
 use crate::subcommands::Subcommand;
-use crate::utils::hexstr_to_vec;
+use crate::utils::{hexstr_to_vec, DisplayWidth};
 
 #[derive(StructOpt)]
 pub struct HistogramArgs {
@@ -26,15 +26,15 @@ impl Subcommand for HistogramArgs {
                     hashmap
                 })
                 .into_iter()
-                .collect::<Vec<(u8, i32)>>();
+                .collect::<Vec<(u8, usize)>>();
             result.sort();
             result
         };
 
-        // TODO: max_count_width
+        let max_count_width = histogram.iter().map(|(_, score)| *score).display_width();
 
         histogram.iter().for_each(|&(b, count)| {
-            print!("{:02X} {}", b, count);
+            print!("{:02X} {:count_width$}", b, count, count_width = max_count_width);
 
             if let Some(source_encoding) = &self.source_encoding {
                 print!(" \"{}\"", source_encoding.decode(b));

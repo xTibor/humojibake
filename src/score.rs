@@ -9,7 +9,7 @@ pub enum ScoreStrategy {
 }
 
 impl ScoreStrategy {
-    pub fn eval(&self, charset: &[char], input: &[char]) -> isize {
+    pub fn eval(&self, charset: &[char], input: &[char]) -> usize {
         match self {
             ScoreStrategy::Simple => score_strategy_simple(charset, input),
             ScoreStrategy::Advanced => score_strategy_advanced(charset, input),
@@ -17,11 +17,11 @@ impl ScoreStrategy {
     }
 }
 
-fn score_strategy_simple(charset: &[char], input: &[char]) -> isize {
+fn score_strategy_simple(charset: &[char], input: &[char]) -> usize {
     input.iter().map(|c| if charset.contains(c) { 1 } else { 0 }).sum()
 }
 
-fn score_strategy_advanced(charset: &[char], input: &[char]) -> isize {
+fn score_strategy_advanced(charset: &[char], input: &[char]) -> usize {
     const WORD_SEPARATORS: &[char] = &[
         ' ', '\n', '\t', '\r', '\0', '.', '…', '!', '?', ',', '‚', ':', ';', '\'', '"', '’', '„', '”', '«', '»', '‹',
         '›', '(', ')', '[', ']', '-', '–', '—', '+', '/',
@@ -43,7 +43,7 @@ fn score_strategy_advanced(charset: &[char], input: &[char]) -> isize {
             is_lowercase || is_uppercase || is_capitalcase
         })
         // Cumulative length of the remaining words
-        .map(|word| word.len() as isize)
+        .map(|word| word.len())
         .sum()
     // TODO: Things to explore here:
     //   Boost the score of words with several non-ASCII characters

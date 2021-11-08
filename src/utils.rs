@@ -12,3 +12,16 @@ pub fn hexstr_to_vec(input: &str) -> Result<Vec<u8>, Error> {
         .filter_map(Result::ok)
         .collect::<Vec<u8>>())
 }
+
+pub trait DisplayWidth {
+    fn display_width(self) -> usize;
+}
+
+impl<T> DisplayWidth for T
+where
+    T: Iterator<Item = usize>,
+{
+    fn display_width(self) -> usize {
+        (self.max().unwrap_or(0) as f64).log10().ceil() as usize
+    }
+}

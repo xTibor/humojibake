@@ -6,7 +6,7 @@ use crate::error::Error;
 use crate::language::Language;
 use crate::score::ScoreStrategy;
 use crate::subcommands::Subcommand;
-use crate::utils::hexstr_to_vec;
+use crate::utils::{hexstr_to_vec, DisplayWidth};
 
 #[derive(StructOpt)]
 pub struct GuessHexArgs {
@@ -42,7 +42,7 @@ impl Subcommand for GuessHexArgs {
     fn execute(&self) -> Result<(), Error> {
         let bin_string = hexstr_to_vec(&self.input)?;
 
-        let mut results: Vec<(Language, Encoding, isize, String)> = Vec::new();
+        let mut results: Vec<(Language, Encoding, usize, String)> = Vec::new();
 
         for language in Language::iter() {
             if let Some(filter_language) = &self.filter_language {
@@ -75,11 +75,10 @@ impl Subcommand for GuessHexArgs {
             }
         }
 
-        results.sort_by_key(|(_, _, score, _)| -score);
+        results.sort_by_key(|&(_, _, score, _)| score);
+        results.reverse();
 
-        let max_score_width = (results.iter().map(|(_, _, score, _)| *score).max().unwrap_or(0) as f64)
-            .log10()
-            .ceil() as usize;
+        let max_score_width = results.iter().map(|(_, _, score, _)| *score).display_width();
 
         for (language, encoding_name, score, preview_string) in results {
             print!(
