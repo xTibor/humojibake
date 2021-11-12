@@ -6,4 +6,8 @@ edition = "2021"
 [dependencies]
 structopt = { version = "0.3", default-features = false }
 strum = { version = "0.22", features = ["derive"] }
-utf8-chars = "1.0.2"
+
+# These things feel so fundamental they should have been in std:
+iterslide = "1.0.1"  # Sliding windows over iterators
+itertools = "0.10.1" # Making iterators actually useful
+utf8-chars = "1.0.2" # Character iterators over BufReaders
