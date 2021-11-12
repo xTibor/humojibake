@@ -1,12 +1,12 @@
 use std::io::{self, BufReader, Read};
 
 use iterslide::SlideIterator;
-use itertools::Itertools;
 use structopt::StructOpt;
 
 use crate::encodings::{Encoder, Encoding};
 use crate::error::Error;
 use crate::subcommands::Subcommand;
+use crate::utils::DeltaEncoder;
 
 #[derive(StructOpt)]
 pub struct SearchDeltaspaceArgs {
@@ -23,19 +23,12 @@ pub struct SearchDeltaspaceArgs {
 
 impl Subcommand for SearchDeltaspaceArgs {
     fn execute(&self) -> Result<(), Error> {
-        let input_delta = self
-            .input
-            .chars()
-            .encode(self.encoding)
-            .tuple_windows()
-            .map(|(a, b)| b as isize - a as isize)
-            .collect::<Vec<isize>>();
+        let input_delta = self.input.chars().encode(self.encoding).delta().collect::<Vec<isize>>();
 
         BufReader::new(io::stdin())
             .bytes()
             .filter_map(Result::ok)
-            .tuple_windows()
-            .map(|(a, b)| b as isize - a as isize)
+            .delta()
             .slide(input_delta.len())
             .enumerate()
             .filter(|(_, window_delta)| window_delta == &input_delta)

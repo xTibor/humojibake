@@ -1,3 +1,5 @@
+use itertools::Itertools;
+
 use crate::error::Error;
 
 // TODO: Error handling, less allocation
@@ -23,5 +25,19 @@ where
 {
     fn display_width(self) -> usize {
         (self.max().unwrap_or(0) as f64).log10().ceil() as usize
+    }
+}
+
+pub trait DeltaEncoder<'a> {
+    fn delta(self) -> Box<dyn Iterator<Item = isize> + 'a>;
+}
+
+impl<'a, T, F> DeltaEncoder<'a> for T
+where
+    T: Iterator<Item = F> + 'a,
+    F: std::clone::Clone + std::convert::Into<isize> + 'a,
+{
+    fn delta(self) -> Box<dyn Iterator<Item = isize> + 'a> {
+        Box::new(self.tuple_windows().map(|(a, b)| b.into() - a.into()))
     }
 }
