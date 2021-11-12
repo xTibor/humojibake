@@ -29,29 +29,33 @@ impl Subcommand for ConvertEncodingArgs {
 
         match (self.source_encoding, self.target_encoding) {
             (Some(source_encoding), Some(target_encoding)) => {
-                for b in reader
+                reader
                     .bytes()
                     .filter_map(Result::ok)
                     .decode(source_encoding)
                     .encode(target_encoding)
-                {
-                    writer.write_all(&[b])?;
-                }
+                    .try_for_each(|b| writer.write_all(&[b]))?;
             }
 
             (Some(source_encoding), None) => {
-                for c in reader.bytes().filter_map(Result::ok).decode(source_encoding) {
-                    write!(writer, "{}", c)?;
-                }
+                reader
+                    .bytes()
+                    .filter_map(Result::ok)
+                    .decode(source_encoding)
+                    .try_for_each(|c| write!(writer, "{}", c))?;
             }
 
             (None, Some(target_encoding)) => {
-                for b in reader.chars().filter_map(Result::ok).encode(target_encoding) {
-                    writer.write_all(&[b])?;
-                }
+                reader
+                    .chars()
+                    .filter_map(Result::ok)
+                    .encode(target_encoding)
+                    .try_for_each(|b| writer.write_all(&[b]))?;
             }
 
-            (None, None) => {}
+            (None, None) => {
+                io::copy(&mut reader, &mut writer)?;
+            }
         }
 
         Ok(())
