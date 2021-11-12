@@ -1,6 +1,4 @@
-mod convert_between;
-mod convert_from_utf8;
-mod convert_to_utf8;
+mod convert_encoding;
 mod encode_hex;
 mod guess_hex;
 mod histogram;
@@ -9,9 +7,7 @@ mod showcase;
 mod supported_encodings;
 mod supported_languages;
 
-use self::convert_between::ConvertBetweenArgs;
-use self::convert_from_utf8::ConvertFromUtf8Args;
-use self::convert_to_utf8::ConvertToUtf8Args;
+use self::convert_encoding::ConvertEncodingArgs;
 use self::encode_hex::EncodeHexArgs;
 use self::guess_hex::GuessHexArgs;
 use self::histogram::HistogramArgs;
@@ -30,9 +26,7 @@ pub trait Subcommand {
 
 #[derive(StructOpt)]
 pub enum SubcommandArgs {
-    ConvertBetween(ConvertBetweenArgs),
-    ConvertFromUtf8(ConvertFromUtf8Args),
-    ConvertToUtf8(ConvertToUtf8Args),
+    ConvertEncoding(ConvertEncodingArgs),
     EncodeHex(EncodeHexArgs),
     GuessHex(GuessHexArgs),
     Histogram(HistogramArgs),
@@ -45,9 +39,7 @@ pub enum SubcommandArgs {
 impl Subcommand for SubcommandArgs {
     fn execute(&self) -> Result<(), Error> {
         match self {
-            SubcommandArgs::ConvertBetween(args) => args.execute(),
-            SubcommandArgs::ConvertFromUtf8(args) => args.execute(),
-            SubcommandArgs::ConvertToUtf8(args) => args.execute(),
+            SubcommandArgs::ConvertEncoding(args) => args.execute(),
             SubcommandArgs::EncodeHex(args) => args.execute(),
             SubcommandArgs::GuessHex(args) => args.execute(),
             SubcommandArgs::Histogram(args) => args.execute(),
