@@ -13,19 +13,19 @@ pub struct ShowcaseArgs {
     )]
     pub input: String,
 
-    #[structopt(long, help = "Hide uncommon encodings")]
-    pub hide_uncommon: bool,
+    #[structopt(long, help = "Show uncommon encodings")]
+    pub show_uncommon: bool,
 }
 
 impl Subcommand for ShowcaseArgs {
     fn execute(&self) -> Result<(), Error> {
         for source_encoding in Encoding::iter() {
-            if self.hide_uncommon && !source_encoding.is_common() {
+            if !self.show_uncommon && !source_encoding.is_common() {
                 continue;
             }
 
             for target_encoding in Encoding::iter() {
-                if self.hide_uncommon && !target_encoding.is_common() {
+                if !self.show_uncommon && !target_encoding.is_common() {
                     continue;
                 }
 
